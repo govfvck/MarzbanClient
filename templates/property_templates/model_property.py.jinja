@@ -11,7 +11,7 @@
 {% macro check_type_for_construct(property, source) %}isinstance({{ source }}, dict){% endmacro %}
 
 {% macro transform(property, source, destination, declare_type=True) %}
-{% set transformed = source + ".to_dict()" %}
+{% set transformed = source + ".model_dump()" %}
 {% set type_string = property.get_type_string(json=True) %}
 {% if property.required %}
 {{ destination }} = {{ transformed }}
@@ -35,7 +35,7 @@ if not isinstance({{ source }}, Unset):
 {% endmacro %}
 
 {% macro transform_multipart(property, source, destination) %}
-{% set transformed = "(None, json.dumps(" + source + ".to_dict()" + ").encode(), 'application/json')" %}
+{% set transformed = "(None, json.dumps(" + source + ".model_dump()" + ").encode(), 'application/json')" %}
 {% set type_string = property.get_type_string(multipart=True) %}
 {% if property.required %}
 {{ destination }} = {{ transformed }}

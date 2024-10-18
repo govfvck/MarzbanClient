@@ -20,7 +20,7 @@ def _get_kwargs(
         "url": "/api/user",
     }
 
-    _body = body.to_dict()
+    _body = body.model_dump()
 
     _kwargs["json"] = _body
     headers["Content-Type"] = "application/json"

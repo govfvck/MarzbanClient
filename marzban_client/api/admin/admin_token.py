@@ -20,7 +20,7 @@ def _get_kwargs(
         "url": "/api/admin/token",
     }
 
-    _body = body.to_dict()
+    _body = body.model_dump()
 
     _kwargs["data"] = _body
     headers["Content-Type"] = "application/x-www-form-urlencoded"
