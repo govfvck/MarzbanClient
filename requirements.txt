@@ -1,0 +1,2 @@
+openapi-python-client==0.21.5
+datamodel-code-generator=0.26.2

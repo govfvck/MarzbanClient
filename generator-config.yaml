@@ -1,0 +1,15 @@
+project_name_override: .
+package_name_override: marzban_client
+
+class_overrides:
+  BodyLoginForAccessTokenApiAdminTokenPost:
+    class_name: BodyLoginForAcessToken
+    module_name: body_login_for_acess_token
+
+  GetInboundsApiInboundsGetResponseGetInboundsApiInboundsGet:
+    class_name: GetInboundsResponse
+    module_name: get_inbounds_response
+  
+  GetHostsApiHostsGetResponseGetHostsApiHostsGet:
+    class_name: GetHostsResponse
+    module_name: get_hosts_response
