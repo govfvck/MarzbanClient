@@ -5,7 +5,7 @@ import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models.node_settings import NodeSettings
+from ...models import NodeSettings
 from ...types import Response
 
 

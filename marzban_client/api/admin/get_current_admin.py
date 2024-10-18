@@ -5,7 +5,7 @@ import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models.admin import Admin
+from ...models import Admin
 from ...types import Response
 
 

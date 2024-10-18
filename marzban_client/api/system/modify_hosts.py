@@ -5,9 +5,7 @@ import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models.http_validation_error import HTTPValidationError
-from ...models.modify_hosts_modified_hosts import ModifyHostsModifiedHosts
-from ...models.modify_hosts_response_modify_hosts_api_hosts_put import ModifyHostsResponseModifyHostsApiHostsPut
+from ...models import HTTPValidationError, ModifyHostsModifiedHosts, ModifyHostsResponseModifyHostsApiHostsPut
 from ...types import Response
 
 

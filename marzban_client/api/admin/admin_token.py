@@ -5,9 +5,7 @@ import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models.body_admin_token_api_admin_token_post import BodyAdminTokenApiAdminTokenPost
-from ...models.http_validation_error import HTTPValidationError
-from ...models.token import Token
+from ...models import BodyAdminTokenApiAdminTokenPost, HTTPValidationError, Token
 from ...types import Response
 
 

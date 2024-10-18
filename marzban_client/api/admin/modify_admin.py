@@ -5,9 +5,7 @@ import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models.admin import Admin
-from ...models.admin_modify import AdminModify
-from ...models.http_validation_error import HTTPValidationError
+from ...models import Admin, AdminModify, HTTPValidationError
 from ...types import Response
 
 

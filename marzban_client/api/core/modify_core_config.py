@@ -5,9 +5,9 @@ import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models.http_validation_error import HTTPValidationError
-from ...models.modify_core_config_payload import ModifyCoreConfigPayload
-from ...models.modify_core_config_response_modify_core_config_api_core_config_put import (
+from ...models import (
+    HTTPValidationError,
+    ModifyCoreConfigPayload,
     ModifyCoreConfigResponseModifyCoreConfigApiCoreConfigPut,
 )
 from ...types import Response

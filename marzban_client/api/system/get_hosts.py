@@ -5,7 +5,7 @@ import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models.get_hosts_response_get_hosts_api_hosts_get import GetHostsResponseGetHostsApiHostsGet
+from ...models import GetHostsResponseGetHostsApiHostsGet
 from ...types import Response
 
 

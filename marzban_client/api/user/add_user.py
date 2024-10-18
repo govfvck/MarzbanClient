@@ -5,9 +5,7 @@ import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models.http_validation_error import HTTPValidationError
-from ...models.user_create import UserCreate
-from ...models.user_response import UserResponse
+from ...models import HTTPValidationError, UserCreate, UserResponse
 from ...types import Response
 
 

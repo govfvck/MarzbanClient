@@ -5,8 +5,7 @@ import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models.http_validation_error import HTTPValidationError
-from ...models.nodes_usage_response import NodesUsageResponse
+from ...models import HTTPValidationError, NodesUsageResponse
 from ...types import UNSET, Response, Unset
 
 

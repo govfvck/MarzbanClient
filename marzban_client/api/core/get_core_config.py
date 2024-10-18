@@ -5,9 +5,7 @@ import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models.get_core_config_response_get_core_config_api_core_config_get import (
-    GetCoreConfigResponseGetCoreConfigApiCoreConfigGet,
-)
+from ...models import GetCoreConfigResponseGetCoreConfigApiCoreConfigGet
 from ...types import Response
 
 

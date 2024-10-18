@@ -5,8 +5,7 @@ import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models.http_validation_error import HTTPValidationError
-from ...models.subscription_user_response import SubscriptionUserResponse
+from ...models import HTTPValidationError, SubscriptionUserResponse
 from ...types import Response
 
 

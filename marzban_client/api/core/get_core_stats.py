@@ -5,7 +5,7 @@ import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models.core_stats import CoreStats
+from ...models import CoreStats
 from ...types import Response
 
 

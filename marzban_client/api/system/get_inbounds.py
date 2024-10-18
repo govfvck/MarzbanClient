@@ -5,7 +5,7 @@ import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models.get_inbounds_response_get_inbounds_api_inbounds_get import GetInboundsResponseGetInboundsApiInboundsGet
+from ...models import GetInboundsResponseGetInboundsApiInboundsGet
 from ...types import Response
 
 
