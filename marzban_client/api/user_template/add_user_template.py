@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Any, Dict, Optional, Union, cast
+from typing import Any, Dict, Optional, Union
 
 import httpx
 
@@ -31,7 +31,7 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[Union[Any, HTTPValidationError, UserTemplateResponse]]:
+) -> Optional[Union[HTTPValidationError, UserTemplateResponse]]:
     if response.status_code == HTTPStatus.OK:
         response_200 = UserTemplateResponse.model_validate(response.json())
 
@@ -40,9 +40,6 @@ def _parse_response(
         response_422 = HTTPValidationError.model_validate(response.json())
 
         return response_422
-    if response.status_code == HTTPStatus.CONFLICT:
-        response_409 = cast(Any, None)
-        return response_409
     if client.raise_on_unexpected_status:
         raise errors.UnexpectedStatus(response.status_code, response.content)
     else:
@@ -51,7 +48,7 @@ def _parse_response(
 
 def _build_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[Union[Any, HTTPValidationError, UserTemplateResponse]]:
+) -> Response[Union[HTTPValidationError, UserTemplateResponse]]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -64,7 +61,7 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: UserTemplateCreate,
-) -> Response[Union[Any, HTTPValidationError, UserTemplateResponse]]:
+) -> Response[Union[HTTPValidationError, UserTemplateResponse]]:
     """Add User Template
 
      Add a new user template
@@ -83,7 +80,7 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[Any, HTTPValidationError, UserTemplateResponse]]
+        Response[Union[HTTPValidationError, UserTemplateResponse]]
     """
 
     kwargs = _get_kwargs(
@@ -101,7 +98,7 @@ def sync(
     *,
     client: AuthenticatedClient,
     body: UserTemplateCreate,
-) -> Optional[Union[Any, HTTPValidationError, UserTemplateResponse]]:
+) -> Optional[Union[HTTPValidationError, UserTemplateResponse]]:
     """Add User Template
 
      Add a new user template
@@ -120,7 +117,7 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[Any, HTTPValidationError, UserTemplateResponse]
+        Union[HTTPValidationError, UserTemplateResponse]
     """
 
     return sync_detailed(
@@ -133,7 +130,7 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     body: UserTemplateCreate,
-) -> Response[Union[Any, HTTPValidationError, UserTemplateResponse]]:
+) -> Response[Union[HTTPValidationError, UserTemplateResponse]]:
     """Add User Template
 
      Add a new user template
@@ -152,7 +149,7 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[Any, HTTPValidationError, UserTemplateResponse]]
+        Response[Union[HTTPValidationError, UserTemplateResponse]]
     """
 
     kwargs = _get_kwargs(
@@ -168,7 +165,7 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     body: UserTemplateCreate,
-) -> Optional[Union[Any, HTTPValidationError, UserTemplateResponse]]:
+) -> Optional[Union[HTTPValidationError, UserTemplateResponse]]:
     """Add User Template
 
      Add a new user template
@@ -187,7 +184,7 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[Any, HTTPValidationError, UserTemplateResponse]
+        Union[HTTPValidationError, UserTemplateResponse]
     """
 
     return (

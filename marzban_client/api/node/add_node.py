@@ -5,7 +5,7 @@ import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models import HTTPValidationError, NodeCreate, NodeResponse
+from ...models import Conflict, Forbidden, HTTPValidationError, NodeCreate, NodeResponse, Unauthorized
 from ...types import Response
 
 
@@ -31,11 +31,23 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[Union[HTTPValidationError, NodeResponse]]:
+) -> Optional[Union[Conflict, Forbidden, HTTPValidationError, NodeResponse, Unauthorized]]:
     if response.status_code == HTTPStatus.OK:
         response_200 = NodeResponse.model_validate(response.json())
 
         return response_200
+    if response.status_code == HTTPStatus.UNAUTHORIZED:
+        response_401 = Unauthorized.model_validate(response.json())
+
+        return response_401
+    if response.status_code == HTTPStatus.FORBIDDEN:
+        response_403 = Forbidden.model_validate(response.json())
+
+        return response_403
+    if response.status_code == HTTPStatus.CONFLICT:
+        response_409 = Conflict.model_validate(response.json())
+
+        return response_409
     if response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY:
         response_422 = HTTPValidationError.model_validate(response.json())
 
@@ -48,7 +60,7 @@ def _parse_response(
 
 def _build_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[Union[HTTPValidationError, NodeResponse]]:
+) -> Response[Union[Conflict, Forbidden, HTTPValidationError, NodeResponse, Unauthorized]]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -61,7 +73,7 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: NodeCreate,
-) -> Response[Union[HTTPValidationError, NodeResponse]]:
+) -> Response[Union[Conflict, Forbidden, HTTPValidationError, NodeResponse, Unauthorized]]:
     """Add Node
 
      Add a new node to the database and optionally add it as a host.
@@ -75,7 +87,7 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[HTTPValidationError, NodeResponse]]
+        Response[Union[Conflict, Forbidden, HTTPValidationError, NodeResponse, Unauthorized]]
     """
 
     kwargs = _get_kwargs(
@@ -93,7 +105,7 @@ def sync(
     *,
     client: AuthenticatedClient,
     body: NodeCreate,
-) -> Optional[Union[HTTPValidationError, NodeResponse]]:
+) -> Optional[Union[Conflict, Forbidden, HTTPValidationError, NodeResponse, Unauthorized]]:
     """Add Node
 
      Add a new node to the database and optionally add it as a host.
@@ -107,7 +119,7 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[HTTPValidationError, NodeResponse]
+        Union[Conflict, Forbidden, HTTPValidationError, NodeResponse, Unauthorized]
     """
 
     return sync_detailed(
@@ -120,7 +132,7 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     body: NodeCreate,
-) -> Response[Union[HTTPValidationError, NodeResponse]]:
+) -> Response[Union[Conflict, Forbidden, HTTPValidationError, NodeResponse, Unauthorized]]:
     """Add Node
 
      Add a new node to the database and optionally add it as a host.
@@ -134,7 +146,7 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[HTTPValidationError, NodeResponse]]
+        Response[Union[Conflict, Forbidden, HTTPValidationError, NodeResponse, Unauthorized]]
     """
 
     kwargs = _get_kwargs(
@@ -150,7 +162,7 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     body: NodeCreate,
-) -> Optional[Union[HTTPValidationError, NodeResponse]]:
+) -> Optional[Union[Conflict, Forbidden, HTTPValidationError, NodeResponse, Unauthorized]]:
     """Add Node
 
      Add a new node to the database and optionally add it as a host.
@@ -164,7 +176,7 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[HTTPValidationError, NodeResponse]
+        Union[Conflict, Forbidden, HTTPValidationError, NodeResponse, Unauthorized]
     """
 
     return (

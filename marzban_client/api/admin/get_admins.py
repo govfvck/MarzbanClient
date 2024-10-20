@@ -5,7 +5,7 @@ import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models import Admin, HTTPValidationError
+from ...models import Admin, Forbidden, HTTPValidationError, Unauthorized
 from ...types import UNSET, Response, Unset
 
 
@@ -36,7 +36,7 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[Union[HTTPValidationError, List["Admin"]]]:
+) -> Optional[Union[Forbidden, HTTPValidationError, List["Admin"], Unauthorized]]:
     if response.status_code == HTTPStatus.OK:
         response_200 = []
         _response_200 = response.json()
@@ -46,6 +46,14 @@ def _parse_response(
             response_200.append(response_200_item)
 
         return response_200
+    if response.status_code == HTTPStatus.UNAUTHORIZED:
+        response_401 = Unauthorized.model_validate(response.json())
+
+        return response_401
+    if response.status_code == HTTPStatus.FORBIDDEN:
+        response_403 = Forbidden.model_validate(response.json())
+
+        return response_403
     if response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY:
         response_422 = HTTPValidationError.model_validate(response.json())
 
@@ -58,7 +66,7 @@ def _parse_response(
 
 def _build_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[Union[HTTPValidationError, List["Admin"]]]:
+) -> Response[Union[Forbidden, HTTPValidationError, List["Admin"], Unauthorized]]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -73,7 +81,7 @@ def sync_detailed(
     offset: Union[Unset, int] = UNSET,
     limit: Union[Unset, int] = UNSET,
     username: Union[Unset, str] = UNSET,
-) -> Response[Union[HTTPValidationError, List["Admin"]]]:
+) -> Response[Union[Forbidden, HTTPValidationError, List["Admin"], Unauthorized]]:
     """Get Admins
 
      Fetch a list of admins with optional filters for pagination and username.
@@ -88,7 +96,7 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[HTTPValidationError, List['Admin']]]
+        Response[Union[Forbidden, HTTPValidationError, List['Admin'], Unauthorized]]
     """
 
     kwargs = _get_kwargs(
@@ -110,7 +118,7 @@ def sync(
     offset: Union[Unset, int] = UNSET,
     limit: Union[Unset, int] = UNSET,
     username: Union[Unset, str] = UNSET,
-) -> Optional[Union[HTTPValidationError, List["Admin"]]]:
+) -> Optional[Union[Forbidden, HTTPValidationError, List["Admin"], Unauthorized]]:
     """Get Admins
 
      Fetch a list of admins with optional filters for pagination and username.
@@ -125,7 +133,7 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[HTTPValidationError, List['Admin']]
+        Union[Forbidden, HTTPValidationError, List['Admin'], Unauthorized]
     """
 
     return sync_detailed(
@@ -142,7 +150,7 @@ async def asyncio_detailed(
     offset: Union[Unset, int] = UNSET,
     limit: Union[Unset, int] = UNSET,
     username: Union[Unset, str] = UNSET,
-) -> Response[Union[HTTPValidationError, List["Admin"]]]:
+) -> Response[Union[Forbidden, HTTPValidationError, List["Admin"], Unauthorized]]:
     """Get Admins
 
      Fetch a list of admins with optional filters for pagination and username.
@@ -157,7 +165,7 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[HTTPValidationError, List['Admin']]]
+        Response[Union[Forbidden, HTTPValidationError, List['Admin'], Unauthorized]]
     """
 
     kwargs = _get_kwargs(
@@ -177,7 +185,7 @@ async def asyncio(
     offset: Union[Unset, int] = UNSET,
     limit: Union[Unset, int] = UNSET,
     username: Union[Unset, str] = UNSET,
-) -> Optional[Union[HTTPValidationError, List["Admin"]]]:
+) -> Optional[Union[Forbidden, HTTPValidationError, List["Admin"], Unauthorized]]:
     """Get Admins
 
      Fetch a list of admins with optional filters for pagination and username.
@@ -192,7 +200,7 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[HTTPValidationError, List['Admin']]
+        Union[Forbidden, HTTPValidationError, List['Admin'], Unauthorized]
     """
 
     return (

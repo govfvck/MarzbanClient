@@ -5,7 +5,7 @@ import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models import CoreStats
+from ...models import CoreStats, Unauthorized
 from ...types import Response
 
 
@@ -18,18 +18,26 @@ def _get_kwargs() -> Dict[str, Any]:
     return _kwargs
 
 
-def _parse_response(*, client: Union[AuthenticatedClient, Client], response: httpx.Response) -> Optional[CoreStats]:
+def _parse_response(
+    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
+) -> Optional[Union[CoreStats, Unauthorized]]:
     if response.status_code == HTTPStatus.OK:
         response_200 = CoreStats.model_validate(response.json())
 
         return response_200
+    if response.status_code == HTTPStatus.UNAUTHORIZED:
+        response_401 = Unauthorized.model_validate(response.json())
+
+        return response_401
     if client.raise_on_unexpected_status:
         raise errors.UnexpectedStatus(response.status_code, response.content)
     else:
         return None
 
 
-def _build_response(*, client: Union[AuthenticatedClient, Client], response: httpx.Response) -> Response[CoreStats]:
+def _build_response(
+    *, client: Union[AuthenticatedClient, Client], response: httpx.Response
+) -> Response[Union[CoreStats, Unauthorized]]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -41,7 +49,7 @@ def _build_response(*, client: Union[AuthenticatedClient, Client], response: htt
 def sync_detailed(
     *,
     client: AuthenticatedClient,
-) -> Response[CoreStats]:
+) -> Response[Union[CoreStats, Unauthorized]]:
     """Get Core Stats
 
      Retrieve core statistics such as version and uptime.
@@ -51,7 +59,7 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[CoreStats]
+        Response[Union[CoreStats, Unauthorized]]
     """
 
     kwargs = _get_kwargs()
@@ -66,7 +74,7 @@ def sync_detailed(
 def sync(
     *,
     client: AuthenticatedClient,
-) -> Optional[CoreStats]:
+) -> Optional[Union[CoreStats, Unauthorized]]:
     """Get Core Stats
 
      Retrieve core statistics such as version and uptime.
@@ -76,7 +84,7 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        CoreStats
+        Union[CoreStats, Unauthorized]
     """
 
     return sync_detailed(
@@ -87,7 +95,7 @@ def sync(
 async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
-) -> Response[CoreStats]:
+) -> Response[Union[CoreStats, Unauthorized]]:
     """Get Core Stats
 
      Retrieve core statistics such as version and uptime.
@@ -97,7 +105,7 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[CoreStats]
+        Response[Union[CoreStats, Unauthorized]]
     """
 
     kwargs = _get_kwargs()
@@ -110,7 +118,7 @@ async def asyncio_detailed(
 async def asyncio(
     *,
     client: AuthenticatedClient,
-) -> Optional[CoreStats]:
+) -> Optional[Union[CoreStats, Unauthorized]]:
     """Get Core Stats
 
      Retrieve core statistics such as version and uptime.
@@ -120,7 +128,7 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        CoreStats
+        Union[CoreStats, Unauthorized]
     """
 
     return (

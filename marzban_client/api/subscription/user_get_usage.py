@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Any, Dict, Optional, Union, cast
+from typing import Any, Dict, Optional, Union
 
 import httpx
 
@@ -42,9 +42,6 @@ def _parse_response(
         response_422 = HTTPValidationError.model_validate(response.json())
 
         return response_422
-    if response.status_code == HTTPStatus.BAD_REQUEST:
-        response_400 = cast(Any, None)
-        return response_400
     if client.raise_on_unexpected_status:
         raise errors.UnexpectedStatus(response.status_code, response.content)
     else:
