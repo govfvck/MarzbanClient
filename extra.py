@@ -11,4 +11,4 @@ class AdditionalResponse(BaseModel):
 
 
 class InboundsResponse(AdditionalResponse):
-    additional_properties: dict[str, ProxyInbound] = {}
+    additional_properties: dict[str, list[ProxyInbound]] = {}
