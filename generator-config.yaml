@@ -5,6 +5,8 @@ class_overrides:
   BodyLoginForAccessTokenApiAdminTokenPost:
     class_name: BodyLoginForAcessToken
     module_name: body_login_for_acess_token
+  GetInboundsResponseGetInboundsApiInboundsGet:
+    class_name: InboundsResponse
 
   GetInboundsApiInboundsGetResponseGetInboundsApiInboundsGet:
     class_name: GetInboundsResponse
