@@ -1,11 +1,11 @@
 from http import HTTPStatus
-from typing import Any, Dict, List, Optional, Union, cast
+from typing import Any, Dict, List, Optional, Union
 
 import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models import HTTPValidationError, UsersUsagesResponse
+from ...models import HTTPValidationError, Unauthorized, UsersUsagesResponse
 from ...types import UNSET, Response, Unset
 
 
@@ -40,18 +40,19 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[Union[Any, HTTPValidationError, UsersUsagesResponse]]:
+) -> Optional[Union[HTTPValidationError, Unauthorized, UsersUsagesResponse]]:
     if response.status_code == HTTPStatus.OK:
         response_200 = UsersUsagesResponse.model_validate(response.json())
 
         return response_200
+    if response.status_code == HTTPStatus.UNAUTHORIZED:
+        response_401 = Unauthorized.model_validate(response.json())
+
+        return response_401
     if response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY:
         response_422 = HTTPValidationError.model_validate(response.json())
 
         return response_422
-    if response.status_code == HTTPStatus.BAD_REQUEST:
-        response_400 = cast(Any, None)
-        return response_400
     if client.raise_on_unexpected_status:
         raise errors.UnexpectedStatus(response.status_code, response.content)
     else:
@@ -60,7 +61,7 @@ def _parse_response(
 
 def _build_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[Union[Any, HTTPValidationError, UsersUsagesResponse]]:
+) -> Response[Union[HTTPValidationError, Unauthorized, UsersUsagesResponse]]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -75,7 +76,7 @@ def sync_detailed(
     start: Union[Unset, str] = "",
     end: Union[Unset, str] = "",
     admin: Union[Unset, List[str]] = UNSET,
-) -> Response[Union[Any, HTTPValidationError, UsersUsagesResponse]]:
+) -> Response[Union[HTTPValidationError, Unauthorized, UsersUsagesResponse]]:
     """Get Users Usage
 
      Get all users usage
@@ -90,7 +91,7 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[Any, HTTPValidationError, UsersUsagesResponse]]
+        Response[Union[HTTPValidationError, Unauthorized, UsersUsagesResponse]]
     """
 
     kwargs = _get_kwargs(
@@ -112,7 +113,7 @@ def sync(
     start: Union[Unset, str] = "",
     end: Union[Unset, str] = "",
     admin: Union[Unset, List[str]] = UNSET,
-) -> Optional[Union[Any, HTTPValidationError, UsersUsagesResponse]]:
+) -> Optional[Union[HTTPValidationError, Unauthorized, UsersUsagesResponse]]:
     """Get Users Usage
 
      Get all users usage
@@ -127,7 +128,7 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[Any, HTTPValidationError, UsersUsagesResponse]
+        Union[HTTPValidationError, Unauthorized, UsersUsagesResponse]
     """
 
     return sync_detailed(
@@ -144,7 +145,7 @@ async def asyncio_detailed(
     start: Union[Unset, str] = "",
     end: Union[Unset, str] = "",
     admin: Union[Unset, List[str]] = UNSET,
-) -> Response[Union[Any, HTTPValidationError, UsersUsagesResponse]]:
+) -> Response[Union[HTTPValidationError, Unauthorized, UsersUsagesResponse]]:
     """Get Users Usage
 
      Get all users usage
@@ -159,7 +160,7 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[Any, HTTPValidationError, UsersUsagesResponse]]
+        Response[Union[HTTPValidationError, Unauthorized, UsersUsagesResponse]]
     """
 
     kwargs = _get_kwargs(
@@ -179,7 +180,7 @@ async def asyncio(
     start: Union[Unset, str] = "",
     end: Union[Unset, str] = "",
     admin: Union[Unset, List[str]] = UNSET,
-) -> Optional[Union[Any, HTTPValidationError, UsersUsagesResponse]]:
+) -> Optional[Union[HTTPValidationError, Unauthorized, UsersUsagesResponse]]:
     """Get Users Usage
 
      Get all users usage
@@ -194,7 +195,7 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[Any, HTTPValidationError, UsersUsagesResponse]
+        Union[HTTPValidationError, Unauthorized, UsersUsagesResponse]
     """
 
     return (

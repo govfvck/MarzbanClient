@@ -5,7 +5,7 @@ import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models import HTTPValidationError, UserResponse
+from ...models import Forbidden, HTTPValidationError, NotFound, Unauthorized, UserResponse
 from ...types import Response
 
 
@@ -22,11 +22,23 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[Union[HTTPValidationError, UserResponse]]:
+) -> Optional[Union[Forbidden, HTTPValidationError, NotFound, Unauthorized, UserResponse]]:
     if response.status_code == HTTPStatus.OK:
         response_200 = UserResponse.model_validate(response.json())
 
         return response_200
+    if response.status_code == HTTPStatus.UNAUTHORIZED:
+        response_401 = Unauthorized.model_validate(response.json())
+
+        return response_401
+    if response.status_code == HTTPStatus.FORBIDDEN:
+        response_403 = Forbidden.model_validate(response.json())
+
+        return response_403
+    if response.status_code == HTTPStatus.NOT_FOUND:
+        response_404 = NotFound.model_validate(response.json())
+
+        return response_404
     if response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY:
         response_422 = HTTPValidationError.model_validate(response.json())
 
@@ -39,7 +51,7 @@ def _parse_response(
 
 def _build_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[Union[HTTPValidationError, UserResponse]]:
+) -> Response[Union[Forbidden, HTTPValidationError, NotFound, Unauthorized, UserResponse]]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -52,7 +64,7 @@ def sync_detailed(
     username: str,
     *,
     client: AuthenticatedClient,
-) -> Response[Union[HTTPValidationError, UserResponse]]:
+) -> Response[Union[Forbidden, HTTPValidationError, NotFound, Unauthorized, UserResponse]]:
     """Revoke User Subscription
 
      Revoke users subscription (Subscription link and proxies)
@@ -65,7 +77,7 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[HTTPValidationError, UserResponse]]
+        Response[Union[Forbidden, HTTPValidationError, NotFound, Unauthorized, UserResponse]]
     """
 
     kwargs = _get_kwargs(
@@ -83,7 +95,7 @@ def sync(
     username: str,
     *,
     client: AuthenticatedClient,
-) -> Optional[Union[HTTPValidationError, UserResponse]]:
+) -> Optional[Union[Forbidden, HTTPValidationError, NotFound, Unauthorized, UserResponse]]:
     """Revoke User Subscription
 
      Revoke users subscription (Subscription link and proxies)
@@ -96,7 +108,7 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[HTTPValidationError, UserResponse]
+        Union[Forbidden, HTTPValidationError, NotFound, Unauthorized, UserResponse]
     """
 
     return sync_detailed(
@@ -109,7 +121,7 @@ async def asyncio_detailed(
     username: str,
     *,
     client: AuthenticatedClient,
-) -> Response[Union[HTTPValidationError, UserResponse]]:
+) -> Response[Union[Forbidden, HTTPValidationError, NotFound, Unauthorized, UserResponse]]:
     """Revoke User Subscription
 
      Revoke users subscription (Subscription link and proxies)
@@ -122,7 +134,7 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[HTTPValidationError, UserResponse]]
+        Response[Union[Forbidden, HTTPValidationError, NotFound, Unauthorized, UserResponse]]
     """
 
     kwargs = _get_kwargs(
@@ -138,7 +150,7 @@ async def asyncio(
     username: str,
     *,
     client: AuthenticatedClient,
-) -> Optional[Union[HTTPValidationError, UserResponse]]:
+) -> Optional[Union[Forbidden, HTTPValidationError, NotFound, Unauthorized, UserResponse]]:
     """Revoke User Subscription
 
      Revoke users subscription (Subscription link and proxies)
@@ -151,7 +163,7 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[HTTPValidationError, UserResponse]
+        Union[Forbidden, HTTPValidationError, NotFound, Unauthorized, UserResponse]
     """
 
     return (

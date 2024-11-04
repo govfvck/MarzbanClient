@@ -5,7 +5,7 @@ import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models import HTTPValidationError
+from ...models import Forbidden, HTTPValidationError, Unauthorized
 from ...types import Response
 
 
@@ -22,10 +22,18 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[Union[Any, HTTPValidationError]]:
+) -> Optional[Union[Any, Forbidden, HTTPValidationError, Unauthorized]]:
     if response.status_code == HTTPStatus.OK:
         response_200 = response.json()
         return response_200
+    if response.status_code == HTTPStatus.UNAUTHORIZED:
+        response_401 = Unauthorized.model_validate(response.json())
+
+        return response_401
+    if response.status_code == HTTPStatus.FORBIDDEN:
+        response_403 = Forbidden.model_validate(response.json())
+
+        return response_403
     if response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY:
         response_422 = HTTPValidationError.model_validate(response.json())
 
@@ -38,7 +46,7 @@ def _parse_response(
 
 def _build_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[Union[Any, HTTPValidationError]]:
+) -> Response[Union[Any, Forbidden, HTTPValidationError, Unauthorized]]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -51,7 +59,7 @@ def sync_detailed(
     node_id: int,
     *,
     client: AuthenticatedClient,
-) -> Response[Union[Any, HTTPValidationError]]:
+) -> Response[Union[Any, Forbidden, HTTPValidationError, Unauthorized]]:
     """Reconnect Node
 
      Trigger a reconnection for the specified node. Only accessible to sudo admins.
@@ -64,7 +72,7 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[Any, HTTPValidationError]]
+        Response[Union[Any, Forbidden, HTTPValidationError, Unauthorized]]
     """
 
     kwargs = _get_kwargs(
@@ -82,7 +90,7 @@ def sync(
     node_id: int,
     *,
     client: AuthenticatedClient,
-) -> Optional[Union[Any, HTTPValidationError]]:
+) -> Optional[Union[Any, Forbidden, HTTPValidationError, Unauthorized]]:
     """Reconnect Node
 
      Trigger a reconnection for the specified node. Only accessible to sudo admins.
@@ -95,7 +103,7 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[Any, HTTPValidationError]
+        Union[Any, Forbidden, HTTPValidationError, Unauthorized]
     """
 
     return sync_detailed(
@@ -108,7 +116,7 @@ async def asyncio_detailed(
     node_id: int,
     *,
     client: AuthenticatedClient,
-) -> Response[Union[Any, HTTPValidationError]]:
+) -> Response[Union[Any, Forbidden, HTTPValidationError, Unauthorized]]:
     """Reconnect Node
 
      Trigger a reconnection for the specified node. Only accessible to sudo admins.
@@ -121,7 +129,7 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[Any, HTTPValidationError]]
+        Response[Union[Any, Forbidden, HTTPValidationError, Unauthorized]]
     """
 
     kwargs = _get_kwargs(
@@ -137,7 +145,7 @@ async def asyncio(
     node_id: int,
     *,
     client: AuthenticatedClient,
-) -> Optional[Union[Any, HTTPValidationError]]:
+) -> Optional[Union[Any, Forbidden, HTTPValidationError, Unauthorized]]:
     """Reconnect Node
 
      Trigger a reconnection for the specified node. Only accessible to sudo admins.
@@ -150,7 +158,7 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[Any, HTTPValidationError]
+        Union[Any, Forbidden, HTTPValidationError, Unauthorized]
     """
 
     return (

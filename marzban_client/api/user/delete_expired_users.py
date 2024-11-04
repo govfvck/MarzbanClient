@@ -6,7 +6,7 @@ import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models import HTTPValidationError
+from ...models import HTTPValidationError, Unauthorized
 from ...types import UNSET, Response, Unset
 
 
@@ -40,21 +40,19 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[Union[Any, HTTPValidationError, List[str]]]:
+) -> Optional[Union[HTTPValidationError, List[str], Unauthorized]]:
     if response.status_code == HTTPStatus.OK:
         response_200 = cast(List[str], response.json())
 
         return response_200
+    if response.status_code == HTTPStatus.UNAUTHORIZED:
+        response_401 = Unauthorized.model_validate(response.json())
+
+        return response_401
     if response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY:
         response_422 = HTTPValidationError.model_validate(response.json())
 
         return response_422
-    if response.status_code == HTTPStatus.NOT_FOUND:
-        response_404 = cast(Any, None)
-        return response_404
-    if response.status_code == HTTPStatus.BAD_REQUEST:
-        response_400 = cast(Any, None)
-        return response_400
     if client.raise_on_unexpected_status:
         raise errors.UnexpectedStatus(response.status_code, response.content)
     else:
@@ -63,7 +61,7 @@ def _parse_response(
 
 def _build_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[Union[Any, HTTPValidationError, List[str]]]:
+) -> Response[Union[HTTPValidationError, List[str], Unauthorized]]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -77,7 +75,7 @@ def sync_detailed(
     client: AuthenticatedClient,
     expired_after: Union[Unset, datetime.datetime] = UNSET,
     expired_before: Union[Unset, datetime.datetime] = UNSET,
-) -> Response[Union[Any, HTTPValidationError, List[str]]]:
+) -> Response[Union[HTTPValidationError, List[str], Unauthorized]]:
     """Delete Expired Users
 
      Delete users who have expired within the specified date range.
@@ -95,7 +93,7 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[Any, HTTPValidationError, List[str]]]
+        Response[Union[HTTPValidationError, List[str], Unauthorized]]
     """
 
     kwargs = _get_kwargs(
@@ -115,7 +113,7 @@ def sync(
     client: AuthenticatedClient,
     expired_after: Union[Unset, datetime.datetime] = UNSET,
     expired_before: Union[Unset, datetime.datetime] = UNSET,
-) -> Optional[Union[Any, HTTPValidationError, List[str]]]:
+) -> Optional[Union[HTTPValidationError, List[str], Unauthorized]]:
     """Delete Expired Users
 
      Delete users who have expired within the specified date range.
@@ -133,7 +131,7 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[Any, HTTPValidationError, List[str]]
+        Union[HTTPValidationError, List[str], Unauthorized]
     """
 
     return sync_detailed(
@@ -148,7 +146,7 @@ async def asyncio_detailed(
     client: AuthenticatedClient,
     expired_after: Union[Unset, datetime.datetime] = UNSET,
     expired_before: Union[Unset, datetime.datetime] = UNSET,
-) -> Response[Union[Any, HTTPValidationError, List[str]]]:
+) -> Response[Union[HTTPValidationError, List[str], Unauthorized]]:
     """Delete Expired Users
 
      Delete users who have expired within the specified date range.
@@ -166,7 +164,7 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[Any, HTTPValidationError, List[str]]]
+        Response[Union[HTTPValidationError, List[str], Unauthorized]]
     """
 
     kwargs = _get_kwargs(
@@ -184,7 +182,7 @@ async def asyncio(
     client: AuthenticatedClient,
     expired_after: Union[Unset, datetime.datetime] = UNSET,
     expired_before: Union[Unset, datetime.datetime] = UNSET,
-) -> Optional[Union[Any, HTTPValidationError, List[str]]]:
+) -> Optional[Union[HTTPValidationError, List[str], Unauthorized]]:
     """Delete Expired Users
 
      Delete users who have expired within the specified date range.
@@ -202,7 +200,7 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[Any, HTTPValidationError, List[str]]
+        Union[HTTPValidationError, List[str], Unauthorized]
     """
 
     return (

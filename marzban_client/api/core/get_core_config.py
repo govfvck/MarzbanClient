@@ -5,7 +5,7 @@ import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models import GetCoreConfigResponseGetCoreConfigApiCoreConfigGet
+from ...models import Forbidden, GetCoreConfigResponseGetCoreConfigApiCoreConfigGet, Unauthorized
 from ...types import Response
 
 
@@ -20,11 +20,19 @@ def _get_kwargs() -> Dict[str, Any]:
 
 def _parse_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[GetCoreConfigResponseGetCoreConfigApiCoreConfigGet]:
+) -> Optional[Union[Forbidden, GetCoreConfigResponseGetCoreConfigApiCoreConfigGet, Unauthorized]]:
     if response.status_code == HTTPStatus.OK:
         response_200 = GetCoreConfigResponseGetCoreConfigApiCoreConfigGet.model_validate(response.json())
 
         return response_200
+    if response.status_code == HTTPStatus.UNAUTHORIZED:
+        response_401 = Unauthorized.model_validate(response.json())
+
+        return response_401
+    if response.status_code == HTTPStatus.FORBIDDEN:
+        response_403 = Forbidden.model_validate(response.json())
+
+        return response_403
     if client.raise_on_unexpected_status:
         raise errors.UnexpectedStatus(response.status_code, response.content)
     else:
@@ -33,7 +41,7 @@ def _parse_response(
 
 def _build_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[GetCoreConfigResponseGetCoreConfigApiCoreConfigGet]:
+) -> Response[Union[Forbidden, GetCoreConfigResponseGetCoreConfigApiCoreConfigGet, Unauthorized]]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -45,7 +53,7 @@ def _build_response(
 def sync_detailed(
     *,
     client: AuthenticatedClient,
-) -> Response[GetCoreConfigResponseGetCoreConfigApiCoreConfigGet]:
+) -> Response[Union[Forbidden, GetCoreConfigResponseGetCoreConfigApiCoreConfigGet, Unauthorized]]:
     """Get Core Config
 
      Get the current core configuration.
@@ -55,7 +63,7 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[GetCoreConfigResponseGetCoreConfigApiCoreConfigGet]
+        Response[Union[Forbidden, GetCoreConfigResponseGetCoreConfigApiCoreConfigGet, Unauthorized]]
     """
 
     kwargs = _get_kwargs()
@@ -70,7 +78,7 @@ def sync_detailed(
 def sync(
     *,
     client: AuthenticatedClient,
-) -> Optional[GetCoreConfigResponseGetCoreConfigApiCoreConfigGet]:
+) -> Optional[Union[Forbidden, GetCoreConfigResponseGetCoreConfigApiCoreConfigGet, Unauthorized]]:
     """Get Core Config
 
      Get the current core configuration.
@@ -80,7 +88,7 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        GetCoreConfigResponseGetCoreConfigApiCoreConfigGet
+        Union[Forbidden, GetCoreConfigResponseGetCoreConfigApiCoreConfigGet, Unauthorized]
     """
 
     return sync_detailed(
@@ -91,7 +99,7 @@ def sync(
 async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
-) -> Response[GetCoreConfigResponseGetCoreConfigApiCoreConfigGet]:
+) -> Response[Union[Forbidden, GetCoreConfigResponseGetCoreConfigApiCoreConfigGet, Unauthorized]]:
     """Get Core Config
 
      Get the current core configuration.
@@ -101,7 +109,7 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[GetCoreConfigResponseGetCoreConfigApiCoreConfigGet]
+        Response[Union[Forbidden, GetCoreConfigResponseGetCoreConfigApiCoreConfigGet, Unauthorized]]
     """
 
     kwargs = _get_kwargs()
@@ -114,7 +122,7 @@ async def asyncio_detailed(
 async def asyncio(
     *,
     client: AuthenticatedClient,
-) -> Optional[GetCoreConfigResponseGetCoreConfigApiCoreConfigGet]:
+) -> Optional[Union[Forbidden, GetCoreConfigResponseGetCoreConfigApiCoreConfigGet, Unauthorized]]:
     """Get Core Config
 
      Get the current core configuration.
@@ -124,7 +132,7 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        GetCoreConfigResponseGetCoreConfigApiCoreConfigGet
+        Union[Forbidden, GetCoreConfigResponseGetCoreConfigApiCoreConfigGet, Unauthorized]
     """
 
     return (

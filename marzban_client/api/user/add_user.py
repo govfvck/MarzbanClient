@@ -1,11 +1,11 @@
 from http import HTTPStatus
-from typing import Any, Dict, Optional, Union, cast
+from typing import Any, Dict, Optional, Union
 
 import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models import HTTPValidationError, UserCreate, UserResponse
+from ...models import Conflict, HTTPException, HTTPValidationError, Unauthorized, UserCreate, UserResponse
 from ...types import Response
 
 
@@ -31,18 +31,27 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[Union[Any, HTTPValidationError, UserResponse]]:
+) -> Optional[Union[Conflict, HTTPException, HTTPValidationError, Unauthorized, UserResponse]]:
     if response.status_code == HTTPStatus.OK:
         response_200 = UserResponse.model_validate(response.json())
 
         return response_200
+    if response.status_code == HTTPStatus.UNAUTHORIZED:
+        response_401 = Unauthorized.model_validate(response.json())
+
+        return response_401
+    if response.status_code == HTTPStatus.BAD_REQUEST:
+        response_400 = HTTPException.model_validate(response.json())
+
+        return response_400
+    if response.status_code == HTTPStatus.CONFLICT:
+        response_409 = Conflict.model_validate(response.json())
+
+        return response_409
     if response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY:
         response_422 = HTTPValidationError.model_validate(response.json())
 
         return response_422
-    if response.status_code == HTTPStatus.CONFLICT:
-        response_409 = cast(Any, None)
-        return response_409
     if client.raise_on_unexpected_status:
         raise errors.UnexpectedStatus(response.status_code, response.content)
     else:
@@ -51,7 +60,7 @@ def _parse_response(
 
 def _build_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[Union[Any, HTTPValidationError, UserResponse]]:
+) -> Response[Union[Conflict, HTTPException, HTTPValidationError, Unauthorized, UserResponse]]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -64,7 +73,7 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: UserCreate,
-) -> Response[Union[Any, HTTPValidationError, UserResponse]]:
+) -> Response[Union[Conflict, HTTPException, HTTPValidationError, Unauthorized, UserResponse]]:
     """Add User
 
      Add a new user
@@ -93,7 +102,7 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[Any, HTTPValidationError, UserResponse]]
+        Response[Union[Conflict, HTTPException, HTTPValidationError, Unauthorized, UserResponse]]
     """
 
     kwargs = _get_kwargs(
@@ -111,7 +120,7 @@ def sync(
     *,
     client: AuthenticatedClient,
     body: UserCreate,
-) -> Optional[Union[Any, HTTPValidationError, UserResponse]]:
+) -> Optional[Union[Conflict, HTTPException, HTTPValidationError, Unauthorized, UserResponse]]:
     """Add User
 
      Add a new user
@@ -140,7 +149,7 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[Any, HTTPValidationError, UserResponse]
+        Union[Conflict, HTTPException, HTTPValidationError, Unauthorized, UserResponse]
     """
 
     return sync_detailed(
@@ -153,7 +162,7 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     body: UserCreate,
-) -> Response[Union[Any, HTTPValidationError, UserResponse]]:
+) -> Response[Union[Conflict, HTTPException, HTTPValidationError, Unauthorized, UserResponse]]:
     """Add User
 
      Add a new user
@@ -182,7 +191,7 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[Any, HTTPValidationError, UserResponse]]
+        Response[Union[Conflict, HTTPException, HTTPValidationError, Unauthorized, UserResponse]]
     """
 
     kwargs = _get_kwargs(
@@ -198,7 +207,7 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     body: UserCreate,
-) -> Optional[Union[Any, HTTPValidationError, UserResponse]]:
+) -> Optional[Union[Conflict, HTTPException, HTTPValidationError, Unauthorized, UserResponse]]:
     """Add User
 
      Add a new user
@@ -227,7 +236,7 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[Any, HTTPValidationError, UserResponse]
+        Union[Conflict, HTTPException, HTTPValidationError, Unauthorized, UserResponse]
     """
 
     return (

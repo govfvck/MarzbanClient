@@ -5,7 +5,7 @@ import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models import GetHostsResponseGetHostsApiHostsGet
+from ...models import Forbidden, GetHostsResponseGetHostsApiHostsGet, Unauthorized
 from ...types import Response
 
 
@@ -20,11 +20,19 @@ def _get_kwargs() -> Dict[str, Any]:
 
 def _parse_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[GetHostsResponseGetHostsApiHostsGet]:
+) -> Optional[Union[Forbidden, GetHostsResponseGetHostsApiHostsGet, Unauthorized]]:
     if response.status_code == HTTPStatus.OK:
         response_200 = GetHostsResponseGetHostsApiHostsGet.model_validate(response.json())
 
         return response_200
+    if response.status_code == HTTPStatus.UNAUTHORIZED:
+        response_401 = Unauthorized.model_validate(response.json())
+
+        return response_401
+    if response.status_code == HTTPStatus.FORBIDDEN:
+        response_403 = Forbidden.model_validate(response.json())
+
+        return response_403
     if client.raise_on_unexpected_status:
         raise errors.UnexpectedStatus(response.status_code, response.content)
     else:
@@ -33,7 +41,7 @@ def _parse_response(
 
 def _build_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[GetHostsResponseGetHostsApiHostsGet]:
+) -> Response[Union[Forbidden, GetHostsResponseGetHostsApiHostsGet, Unauthorized]]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -45,7 +53,7 @@ def _build_response(
 def sync_detailed(
     *,
     client: AuthenticatedClient,
-) -> Response[GetHostsResponseGetHostsApiHostsGet]:
+) -> Response[Union[Forbidden, GetHostsResponseGetHostsApiHostsGet, Unauthorized]]:
     """Get Hosts
 
      Get a list of proxy hosts grouped by inbound tag.
@@ -55,7 +63,7 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[GetHostsResponseGetHostsApiHostsGet]
+        Response[Union[Forbidden, GetHostsResponseGetHostsApiHostsGet, Unauthorized]]
     """
 
     kwargs = _get_kwargs()
@@ -70,7 +78,7 @@ def sync_detailed(
 def sync(
     *,
     client: AuthenticatedClient,
-) -> Optional[GetHostsResponseGetHostsApiHostsGet]:
+) -> Optional[Union[Forbidden, GetHostsResponseGetHostsApiHostsGet, Unauthorized]]:
     """Get Hosts
 
      Get a list of proxy hosts grouped by inbound tag.
@@ -80,7 +88,7 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        GetHostsResponseGetHostsApiHostsGet
+        Union[Forbidden, GetHostsResponseGetHostsApiHostsGet, Unauthorized]
     """
 
     return sync_detailed(
@@ -91,7 +99,7 @@ def sync(
 async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
-) -> Response[GetHostsResponseGetHostsApiHostsGet]:
+) -> Response[Union[Forbidden, GetHostsResponseGetHostsApiHostsGet, Unauthorized]]:
     """Get Hosts
 
      Get a list of proxy hosts grouped by inbound tag.
@@ -101,7 +109,7 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[GetHostsResponseGetHostsApiHostsGet]
+        Response[Union[Forbidden, GetHostsResponseGetHostsApiHostsGet, Unauthorized]]
     """
 
     kwargs = _get_kwargs()
@@ -114,7 +122,7 @@ async def asyncio_detailed(
 async def asyncio(
     *,
     client: AuthenticatedClient,
-) -> Optional[GetHostsResponseGetHostsApiHostsGet]:
+) -> Optional[Union[Forbidden, GetHostsResponseGetHostsApiHostsGet, Unauthorized]]:
     """Get Hosts
 
      Get a list of proxy hosts grouped by inbound tag.
@@ -124,7 +132,7 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        GetHostsResponseGetHostsApiHostsGet
+        Union[Forbidden, GetHostsResponseGetHostsApiHostsGet, Unauthorized]
     """
 
     return (

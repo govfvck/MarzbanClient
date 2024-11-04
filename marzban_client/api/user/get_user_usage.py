@@ -1,11 +1,11 @@
 from http import HTTPStatus
-from typing import Any, Dict, Optional, Union, cast
+from typing import Any, Dict, Optional, Union
 
 import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models import HTTPValidationError, UserUsagesResponse
+from ...models import Forbidden, HTTPValidationError, NotFound, Unauthorized, UserUsagesResponse
 from ...types import UNSET, Response, Unset
 
 
@@ -34,18 +34,27 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[Union[Any, HTTPValidationError, UserUsagesResponse]]:
+) -> Optional[Union[Forbidden, HTTPValidationError, NotFound, Unauthorized, UserUsagesResponse]]:
     if response.status_code == HTTPStatus.OK:
         response_200 = UserUsagesResponse.model_validate(response.json())
 
         return response_200
+    if response.status_code == HTTPStatus.UNAUTHORIZED:
+        response_401 = Unauthorized.model_validate(response.json())
+
+        return response_401
+    if response.status_code == HTTPStatus.FORBIDDEN:
+        response_403 = Forbidden.model_validate(response.json())
+
+        return response_403
+    if response.status_code == HTTPStatus.NOT_FOUND:
+        response_404 = NotFound.model_validate(response.json())
+
+        return response_404
     if response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY:
         response_422 = HTTPValidationError.model_validate(response.json())
 
         return response_422
-    if response.status_code == HTTPStatus.BAD_REQUEST:
-        response_400 = cast(Any, None)
-        return response_400
     if client.raise_on_unexpected_status:
         raise errors.UnexpectedStatus(response.status_code, response.content)
     else:
@@ -54,7 +63,7 @@ def _parse_response(
 
 def _build_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[Union[Any, HTTPValidationError, UserUsagesResponse]]:
+) -> Response[Union[Forbidden, HTTPValidationError, NotFound, Unauthorized, UserUsagesResponse]]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -69,7 +78,7 @@ def sync_detailed(
     client: AuthenticatedClient,
     start: Union[Unset, str] = "",
     end: Union[Unset, str] = "",
-) -> Response[Union[Any, HTTPValidationError, UserUsagesResponse]]:
+) -> Response[Union[Forbidden, HTTPValidationError, NotFound, Unauthorized, UserUsagesResponse]]:
     """Get User Usage
 
      Get users usage
@@ -84,7 +93,7 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[Any, HTTPValidationError, UserUsagesResponse]]
+        Response[Union[Forbidden, HTTPValidationError, NotFound, Unauthorized, UserUsagesResponse]]
     """
 
     kwargs = _get_kwargs(
@@ -106,7 +115,7 @@ def sync(
     client: AuthenticatedClient,
     start: Union[Unset, str] = "",
     end: Union[Unset, str] = "",
-) -> Optional[Union[Any, HTTPValidationError, UserUsagesResponse]]:
+) -> Optional[Union[Forbidden, HTTPValidationError, NotFound, Unauthorized, UserUsagesResponse]]:
     """Get User Usage
 
      Get users usage
@@ -121,7 +130,7 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[Any, HTTPValidationError, UserUsagesResponse]
+        Union[Forbidden, HTTPValidationError, NotFound, Unauthorized, UserUsagesResponse]
     """
 
     return sync_detailed(
@@ -138,7 +147,7 @@ async def asyncio_detailed(
     client: AuthenticatedClient,
     start: Union[Unset, str] = "",
     end: Union[Unset, str] = "",
-) -> Response[Union[Any, HTTPValidationError, UserUsagesResponse]]:
+) -> Response[Union[Forbidden, HTTPValidationError, NotFound, Unauthorized, UserUsagesResponse]]:
     """Get User Usage
 
      Get users usage
@@ -153,7 +162,7 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[Any, HTTPValidationError, UserUsagesResponse]]
+        Response[Union[Forbidden, HTTPValidationError, NotFound, Unauthorized, UserUsagesResponse]]
     """
 
     kwargs = _get_kwargs(
@@ -173,7 +182,7 @@ async def asyncio(
     client: AuthenticatedClient,
     start: Union[Unset, str] = "",
     end: Union[Unset, str] = "",
-) -> Optional[Union[Any, HTTPValidationError, UserUsagesResponse]]:
+) -> Optional[Union[Forbidden, HTTPValidationError, NotFound, Unauthorized, UserUsagesResponse]]:
     """Get User Usage
 
      Get users usage
@@ -188,7 +197,7 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[Any, HTTPValidationError, UserUsagesResponse]
+        Union[Forbidden, HTTPValidationError, NotFound, Unauthorized, UserUsagesResponse]
     """
 
     return (

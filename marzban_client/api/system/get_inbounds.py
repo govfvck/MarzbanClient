@@ -5,7 +5,7 @@ import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models import InboundsResponse
+from ...models import InboundsResponse, Unauthorized
 from ...types import Response
 
 
@@ -20,11 +20,15 @@ def _get_kwargs() -> Dict[str, Any]:
 
 def _parse_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[InboundsResponse]:
+) -> Optional[Union[InboundsResponse, Unauthorized]]:
     if response.status_code == HTTPStatus.OK:
         response_200 = InboundsResponse.model_validate(response.json())
 
         return response_200
+    if response.status_code == HTTPStatus.UNAUTHORIZED:
+        response_401 = Unauthorized.model_validate(response.json())
+
+        return response_401
     if client.raise_on_unexpected_status:
         raise errors.UnexpectedStatus(response.status_code, response.content)
     else:
@@ -33,7 +37,7 @@ def _parse_response(
 
 def _build_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[InboundsResponse]:
+) -> Response[Union[InboundsResponse, Unauthorized]]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -45,7 +49,7 @@ def _build_response(
 def sync_detailed(
     *,
     client: AuthenticatedClient,
-) -> Response[InboundsResponse]:
+) -> Response[Union[InboundsResponse, Unauthorized]]:
     """Get Inbounds
 
      Retrieve inbound configurations grouped by protocol.
@@ -55,7 +59,7 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[InboundsResponse]
+        Response[Union[InboundsResponse, Unauthorized]]
     """
 
     kwargs = _get_kwargs()
@@ -70,7 +74,7 @@ def sync_detailed(
 def sync(
     *,
     client: AuthenticatedClient,
-) -> Optional[InboundsResponse]:
+) -> Optional[Union[InboundsResponse, Unauthorized]]:
     """Get Inbounds
 
      Retrieve inbound configurations grouped by protocol.
@@ -80,7 +84,7 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        InboundsResponse
+        Union[InboundsResponse, Unauthorized]
     """
 
     return sync_detailed(
@@ -91,7 +95,7 @@ def sync(
 async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
-) -> Response[InboundsResponse]:
+) -> Response[Union[InboundsResponse, Unauthorized]]:
     """Get Inbounds
 
      Retrieve inbound configurations grouped by protocol.
@@ -101,7 +105,7 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[InboundsResponse]
+        Response[Union[InboundsResponse, Unauthorized]]
     """
 
     kwargs = _get_kwargs()
@@ -114,7 +118,7 @@ async def asyncio_detailed(
 async def asyncio(
     *,
     client: AuthenticatedClient,
-) -> Optional[InboundsResponse]:
+) -> Optional[Union[InboundsResponse, Unauthorized]]:
     """Get Inbounds
 
      Retrieve inbound configurations grouped by protocol.
@@ -124,7 +128,7 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        InboundsResponse
+        Union[InboundsResponse, Unauthorized]
     """
 
     return (
