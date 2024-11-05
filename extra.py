@@ -12,3 +12,7 @@ class AdditionalResponse(BaseModel):
 
 class InboundsResponse(AdditionalResponse):
     additional_properties: dict[str, list[ProxyInbound]] = {}
+
+
+class HTTPValidationError(BaseModel):
+    detail: dict[str, str] | None = Field(None, title="Detail")
