@@ -30,7 +30,7 @@ class {{ class_name }}({{ base_class }}):{% if comment is defined %}  # {{ comme
     {%- endif %}
 {%- if 'datetime' in field.type_hint %}
     @field_serializer("{{ field.name }}")
-    def _dt_serializer(self, v: datetime | None) -> str:
+    def _{{field.name}}_serializer(self, v: {{ field.type_hint }}) -> str:
         if isinstance(v, datetime):
             return v.isoformat()
         return v
