@@ -10,7 +10,8 @@ datamodel-codegen --input openapi.json \
     --strict-nullable --snake-case-field --capitalize-enum-members \
     --use-subclass-enum --field-constraints \
     --use-union-operator --use-standard-collections \
-    --additional-imports pydantic.model_validator,pydantic.model_serializer \
+    --custom-template-dir models_templates/pydantic \
+    --additional-imports pydantic.model_validator,pydantic.model_serializer,pydantic.field_serializer \
     >marzban_client/models/__init__.py
 
 cat extra.py >>marzban_client/models/__init__.py
